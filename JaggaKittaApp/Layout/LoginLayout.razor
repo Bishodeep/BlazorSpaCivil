@@ -1,0 +1,19 @@
+@inherits LayoutComponentBase
+
+<MudThemeProvider></MudThemeProvider>
+<MudDialogProvider></MudDialogProvider>
+<MudSnackbarProvider></MudSnackbarProvider>
+<MudLayout>
+    <MudAppBar Elevation="1">
+   
+        <MudSpacer/>
+    </MudAppBar>
+    <MudMainContent Class="pt-16 px-16">
+        <MudContainer Class="mt-6">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+@code {
+    
+}

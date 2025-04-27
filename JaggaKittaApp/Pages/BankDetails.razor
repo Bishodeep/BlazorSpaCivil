@@ -1,0 +1,39 @@
+@using JaggaKittaApp.Models
+<h3>BankDetails</h3>
+<MudStack>
+    <MudSelect @bind-Value="Model.Name"
+               Label="Bank"
+               FitContent="false"
+               Placeholder="Select Bank"
+               HelperText="Please select bank for process"
+               HelperTextOnFocus="true"
+               Clearable="true">
+        @foreach (var bank in bankList)
+        {
+            <MudSelectItem Value="@bank">@bank</MudSelectItem>
+        }
+    </MudSelect>
+    <MudSelect @bind-Value="Model.Branch"
+               Label="Branch"
+               FitContent="false"
+               Placeholder="Select Bank"
+               HelperText="Please select branch for process"
+               HelperTextOnFocus="true"
+               Clearable="true">
+        @foreach (var bank in bankList)
+        {
+            <MudSelectItem Value="bank">@bank</MudSelectItem>
+        }
+    </MudSelect>
+    <MudDatePicker Label="Date of Site visit"  @bind-Date="Model.DateOfSiteVisit" Placeholder="Select Date" />
+</MudStack>
+@code {
+    [Parameter] public BankingDetails Model { get; set; }
+
+    private readonly string[] bankList =
+    {
+        "Siddhartha Bank ltd","Nabil Bank ltd","NIC Asia Bank ltd","Nepal Rastra Bank ltd",
+        "Nepal Investment Mega Bank ltd","Prabhu Bank ltd","LaxmiSunrise Bank ltd"
+    };
+
+}

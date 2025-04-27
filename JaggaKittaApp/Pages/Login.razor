@@ -1,0 +1,74 @@
+@using FluentValidation
+@using JaggaKittaApp.Models
+@using JaggaKittaApp.Validators
+@layout LoginLayout
+@page "/login"
+<MudThemeProvider></MudThemeProvider>
+<MudDialogProvider></MudDialogProvider>
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start"/>
+        <MudSpacer/>
+    </MudAppBar>
+    <MudMainContent Class="pt-16 px-16">
+        <MudContainer Class="mt-6">
+            <MudCard>
+                @if (_isSubmitting)
+                {
+                    <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+                        <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+                    </div>
+                }
+                else
+                {
+                    
+                    <MudForm Model="@_model" @ref="@_form" Validation="@(_loginValidator.ValidateValue)" ValidationDelay="0">
+                        <MudCardContent>
+
+                            <MudTextField @bind-Value="_model.Email"
+                                          For="@(() => _model.Email)"
+                                          Immediate="true"
+                                          Label="Email"/>
+
+                            <MudTextField @bind-Value="_model.Password"
+                                          For="@(() => _model.Password)"
+                                          Immediate="true"
+                                          Label="Password"/>
+
+                        </MudCardContent>
+
+                    </MudForm>
+                    
+                }
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Login</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+
+@code {
+    [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] NavigationManager Navigation { get; set; }
+    MudForm _form;
+    private bool _isSubmitting = false;
+    LoginFluentValidator _loginValidator = new();
+
+    LoginModel _model = new();
+
+    
+    private async Task Submit()
+    {
+        await _form.Validate();
+
+        if (_form.IsValid)
+        {
+             _isSubmitting = true;
+            // Snackbar.Add("Submitted!");
+            Navigation.NavigateTo("/home");
+        }
+    }
+
+}

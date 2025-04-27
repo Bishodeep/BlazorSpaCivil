@@ -1,0 +1,113 @@
+@using JaggaKittaApp.Constants
+@using JaggaKittaApp.Models
+<h3>PropertyInfo</h3>
+<MudStack Spacing="3" Style="margin-bottom: 10px;">
+    @foreach (var Model in PropertyList)
+    {
+        <div style="display: flex; justify-content: flex-end;">
+            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Medium"
+                           OnClick="@(() => RemoveProperty(Model))"/>
+        </div>
+        <MudPaper Class="p-4 mb-4">
+            <h4>Location</h4>
+            <MudTextField @bind-Value="Model.CurrentAddress" Label="Current Address"/>
+            <MudTextField @bind-Value="Model.AddressAsPerLalpurja" Label="Address Per lalpurja"/>
+            <MudTextField @bind-Value="Model.CasdastralMapSheetNumber" Label="Casdastral Map view number"/>
+
+        </MudPaper>
+        <MudPaper Class="p-4 mb-4">
+            <MudTextField @bind-Value="Model.PlotNumber" Label="Plot Number of land"/>
+            <MudTextField @bind-Value="Model.PlotArea" Label="Plot Area of land"/>
+        </MudPaper>
+        <MudPaper>
+            <MudSelect Placeholder="Select property type" @bind-Value="@Model.Type" AdornmentColor="Color.Tertiary"
+                       Style="margin-bottom: 5px;">
+                @foreach (var type in PropertyTypes)
+                {
+                    <MudSelectItem Value="@type">@type</MudSelectItem>
+                }
+            </MudSelect>
+            @if (Model.Type == PropertyTypeConstants.LandAndBuilding)
+            {
+                <MudPaper Class="p-4 mb-4" Style="margin-bottom: 10px;">
+                    <MudTextField Class="p-4" @bind-Value="Model.BuildingInformation.AgeOfBuilding"
+                                  Label="Age of building"/>
+                    <MudSelect Class="p-4 mb-1" Placeholder="Select building type"
+                               @bind-Value="@Model.BuildingInformation.TypeOfBuilding" AdornmentColor="Color.Tertiary">
+                        @foreach (var type in BuildingTypes)
+                        {
+                            <MudSelectItem Value="@type">@type</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudSelect Class="p-4 mb-1" Placeholder="Select certificate type"
+                               @bind-Value="@Model.BuildingInformation.CertificateType" AdornmentColor="Color.Tertiary">
+                        @foreach (var type in CertificateTypes)
+                        {
+                            <MudSelectItem Value="@type">@type</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudDatePicker Class="p-4 mb-1" Label="Date of Naksa pass"
+                                   @bind-Date="Model.BuildingInformation.NaksaPassDate" Placeholder="Select Date"/>
+
+                </MudPaper>
+            }
+        </MudPaper>
+    }
+</MudStack>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddProperty">Add Property</MudButton>
+
+@code {
+    [Parameter] public List<PropertyInformations> PropertyList { get; set; }
+
+    private readonly string[] PropertyTypes =
+    {
+        PropertyTypeConstants.Land, PropertyTypeConstants.LandAndBuilding
+    };
+
+    private readonly string[] BuildingTypes =
+    {
+        "RC Frame", "Load Beaming", "Steel Frame", "Shed", "Combined System", "Others"
+    };
+
+    private readonly string[] CertificateTypes =
+    {
+        CertificateTypeConstants.NirmanSampanna, CertificateTypeConstants.Abhilekhikaran, CertificateTypeConstants.Niyamit
+    };
+
+    protected override void OnInitialized()
+    {
+        if (!PropertyList.Any())
+        {
+            PropertyList.Add(new PropertyInformations());
+        }
+    }
+
+    private void AddProperty()
+    {
+        var newProperty = new PropertyInformations();
+        if (PropertyList.Any())
+        {
+            var existingProperty = PropertyList.FirstOrDefault();
+            newProperty.CurrentAddress = existingProperty.CurrentAddress;
+            newProperty.AddressAsPerLalpurja = existingProperty.AddressAsPerLalpurja;
+            newProperty.CasdastralMapSheetNumber = existingProperty.CasdastralMapSheetNumber;
+            newProperty.Type = existingProperty.Type;
+            if (existingProperty.Type == PropertyTypeConstants.LandAndBuilding)
+            {
+                newProperty.BuildingInformation.TypeOfBuilding = existingProperty.BuildingInformation.TypeOfBuilding;
+                newProperty.BuildingInformation.AgeOfBuilding = existingProperty.BuildingInformation.AgeOfBuilding;
+                newProperty.BuildingInformation.NaksaPassDate = existingProperty.BuildingInformation.NaksaPassDate;
+                newProperty.BuildingInformation.CertificateType = existingProperty.BuildingInformation.CertificateType;
+            }
+        }
+        PropertyList.Add(newProperty);
+    }
+    private void RemoveProperty(PropertyInformations property)
+    {
+        PropertyList.Remove(property);
+    }
+    }
+}

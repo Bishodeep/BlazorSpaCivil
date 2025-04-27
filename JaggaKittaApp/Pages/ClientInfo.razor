@@ -1,0 +1,64 @@
+@using JaggaKittaApp.Models
+<h3>ClientInfo</h3>
+<MudStack Spacing="3" Style="margin-bottom: 10px;">
+    @foreach (var client in Model)
+    {
+        <div style="display: flex; justify-content: flex-end;">
+            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Medium"
+                           OnClick="@(() => RemoveClient(client))"/>
+        </div>
+
+        <MudPaper Class="p-4" Style="margin-bottom: 10px;">
+            <MudTextField @bind-Value="client.FirstName" Label="First Name"/>
+            <MudTextField @bind-Value="client.MiddleName" Label="Middle Name"/>
+            <MudTextField @bind-Value="client.LastName" Label="Last Name"/>
+            <MudTextField @bind-Value="client.Phone" Label="Phone"/>
+            <MudTextField @bind-Value="client.Email" Label="Email"/>
+        </MudPaper>
+        <MudPaper Class="p-4 mb-4">
+            <h4>Address</h4>
+            <MudTextField @bind-Value="client.Address.District" Label="District"></MudTextField>
+            <MudTextField @bind-Value="client.Address.City" Label="City"></MudTextField>
+            <MudTextField @bind-Value="client.Address.Ward" Label="Ward"></MudTextField>
+            <MudTextField @bind-Value="client.Address.Street" Label="Street"></MudTextField>
+        </MudPaper>
+    }
+
+    
+</MudStack>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddClient">Add New Client</MudButton>
+@code {
+    [Parameter] public List<ClientInformations> Model { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (!Model.Any())
+        {
+            Model.Add(new ClientInformations()); 
+        }  
+    }
+
+    private void AddClient()
+    {
+        var addedClient = new ClientInformations();
+        if (Model.Any())
+        {
+            var existingFirstClient = Model.FirstOrDefault();
+            addedClient.Address.District = existingFirstClient.Address.District;
+            addedClient.Address.City = existingFirstClient.Address.City;
+            addedClient.Address.Ward = existingFirstClient.Address.Ward;
+            addedClient.Address.Street = existingFirstClient.Address.Street;
+        }
+
+        Model.Add(addedClient);
+    }
+
+    private void RemoveClient(ClientInformations client)
+    {
+        Model.Remove(client);
+    }
+
+}

@@ -1,0 +1,24 @@
+﻿@page "/"
+@using JaggaKittaApp.Models
+
+<MudPaper>
+    <MudStepper ShowResetButton>
+        <MudStep Title="Bank Details" >
+            <BankDetails Model="@MainForm.BankingDetail"/>
+        </MudStep>
+        <MudStep Title="Client Basic Info" SecondaryText="Optional" Skippable="false" >
+            <ClientInfo Model="@MainForm.ClientInformations"/>
+        </MudStep>
+        <MudStep Title="Property Information" >
+            <PropertyInfo PropertyList="@MainForm.PropertyInformation"/>
+        </MudStep>
+        <MudStep Title="Physical Facilities" >
+            <PhysicalFacilities Model="@MainForm.PropertyInformation.Select(x=>x.PlotNumber)"/>
+        </MudStep>
+    </MudStepper>
+</MudPaper>
+@code{
+
+     ProcessInformationForm MainForm  = new();
+    
+}
