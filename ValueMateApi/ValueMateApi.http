@@ -1,0 +1,6 @@
+@ValueMateApi_HostAddress = http://localhost:5001
+
+GET {{ValueMateApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

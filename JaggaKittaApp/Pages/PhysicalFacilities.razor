@@ -1,19 +1,65 @@
+@using JaggaKittaApp.Models
 <h3>Physical_Facilities</h3>
 <MudStack Spacing="3" Style="margin-bottom: 10px;">
     <MudPaper>
-        <MudSelect Value="PlotNumber"
+        <MudSelect Value="@SelectedPlot"
                    Label="Bank"
                    FitContent="false"
                    Placeholder="Select plot"
-                   Clearable="true">
-            @foreach (var plot in PlotNumber)
+                   Clearable="true" T="string" ValueChanged="AddPhysicalFacilities" >
+            @foreach (var plot in PlotNumbers)
             {
-                <MudSelectItem Value="@plot">@plot</MudSelectItem>
+                <MudSelectItem   Value="@plot">@plot</MudSelectItem>
             }
         </MudSelect>
     </MudPaper> 
+    @foreach (var physicalFac in PropertyInformations.Where(x => x.PhysicalFacilities != null))
+    {
+        <MudPaper>
+            <MudPaper Class="p-4" Style="margin-bottom: 10px;">
+                <MudCheckBox @bind-Value="physicalFac.PhysicalFacilities.ElectricityAvailable" Label="Electricity" Color="Color.Primary"></MudCheckBox>
+                <MudCheckBox @bind-Value="physicalFac.PhysicalFacilities.WaterSupplyAvailable" Label="Water supply" Color="Color.Primary"></MudCheckBox>
+                <MudCheckBox @bind-Value="physicalFac.PhysicalFacilities.SewerAvailable" Label="Sewer / Drain" Color="Color.Primary"></MudCheckBox>
+                <MudCheckBox @bind-Value="physicalFac.PhysicalFacilities.Telephone" Label="Telephone" Color="Color.Primary"></MudCheckBox>
+                <MudCheckBox @bind-Value="physicalFac.PhysicalFacilities.Internet" Label="Internet" Color="Color.Primary"></MudCheckBox>
+                
+                <MudSelect @bind-Value="physicalFac.PhysicalFacilities.RoadType"
+                           Label="Road type"
+                           FitContent="false"
+                           Placeholder="Select road type"
+                           Clearable="true">
+                    @foreach (var type in RoadTypes)
+                    {
+                        <MudSelectItem Value="@type">@type</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudTextField @bind-Value="physicalFac.PhysicalFacilities.WidthOfRoad" Label="Width of Road"/>
+            </MudPaper>
+        </MudPaper>
+    }
+    
 </MudStack>
 
 @code {
-    [Parameter] public string[] PlotNumber { get; set; }
+    private string[] PlotNumbers { get; set; }
+    [Parameter] public List<PropertyInformations> PropertyInformations { get; set; }
+    private string[] AddedPlotFacilities { get; set; }
+    private string[] RoadTypes { get; set; }
+    private string SelectedPlot { get; set; }
+
+    protected override void OnInitialized()
+    {
+        RoadTypes = new string[]
+        {
+            "Pitch Road", "Concrete slab road", "Gravel Road", "Earthern Road"
+        };
+        PlotNumbers = PropertyInformations.Select((x => x.PlotNumber)).ToArray();
+    }
+    private void AddPhysicalFacilities(string plotNumber)
+    {
+        SelectedPlot = plotNumber;
+        var propInfo = PropertyInformations.FirstOrDefault(x => x.PlotNumber == SelectedPlot);
+        propInfo.PhysicalFacilities = new Models.PhysicalFacilities();
+        PlotNumbers = PlotNumbers.Where(x => x != SelectedPlot).ToArray();
+    }
 }

@@ -1,0 +1,9 @@
+@page "/admin"
+@using JaggaKittaApp.Constants
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Policy = ApplicationRoleConstants.Admin)]
+<h3>Admin</h3>
+
+@code {
+    
+}

@@ -1,8 +1,8 @@
 namespace JaggaKittaApp.Models;
 
-public class ProcessInformationForm
+public class ValuationInfoForm
 {
-    public ProcessInformationForm()
+    public ValuationInfoForm()
     {
         BankingDetail = new();
         ClientInformations = new();

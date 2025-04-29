@@ -13,12 +13,12 @@
             <PropertyInfo PropertyList="@MainForm.PropertyInformation"/>
         </MudStep>
         <MudStep Title="Physical Facilities" >
-            <PhysicalFacilities Model="@MainForm.PropertyInformation.Select(x=>x.PlotNumber)"/>
+            <PhysicalFacilities PropertyInformations="@MainForm.PropertyInformation"/>
         </MudStep>
     </MudStepper>
 </MudPaper>
 @code{
 
-     ProcessInformationForm MainForm  = new();
+     ValuationInfoForm MainForm  = new();
     
 }
