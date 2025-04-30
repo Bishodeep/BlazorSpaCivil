@@ -1,36 +1,33 @@
-﻿@using Microsoft.AspNetCore.Authorization
-@* <Router AppAssembly="@typeof(App).Assembly"> *@
-@*     <Found Context="routeData"> *@
-@*         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/> *@
-@*         <FocusOnNavigate RouteData="@routeData" Selector="h1"/> *@
-@*     </Found> *@
-@*     <NotFound> *@
-@*         <PageTitle>Not found</PageTitle> *@
-@*         <LayoutView Layout="@typeof(MainLayout)"> *@
-@*             <p role="alert">Sorry, there's nothing at this address.</p> *@
-@*         </LayoutView> *@
-@*     </NotFound> *@
-@* </Router>
-*@
+﻿@using JaggaKittaApp.Pages
+@using Microsoft.AspNetCore.Components.Authorization
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" 
+                                Context="authContext">
                 <NotAuthorized>
-                    @if (routeData.PageType.CustomAttributes.Any(attr => attr.GetType() == typeof(AuthorizeAttribute)))
+                    @if (routeData.PageType == typeof(Login)) // Allow access to login page
+                    {
+                        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                    }
+                    else if (!(authContext.User?.Identity?.IsAuthenticated ?? false))
                     {
                         <RedirectToLogin />
                     }
                     else
                     {
-                        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/> 
-                        <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+                        <p>You are not authorized to access this page.</p>
                     }
                 </NotAuthorized>
+                <Authorizing>
+                    <MudProgressCircular Indeterminate="true" />
+                </Authorizing>
             </AuthorizeRouteView>
         </Found>
         <NotFound>
-            <h3>Page not found</h3>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p>Sorry, there's nothing at this address.</p>
+            </LayoutView>
         </NotFound>
     </Router>
 </CascadingAuthenticationState>

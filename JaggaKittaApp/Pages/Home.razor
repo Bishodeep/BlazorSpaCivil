@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using JaggaKittaApp.Models
-
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
 <MudPaper>
     <MudStepper ShowResetButton>
         <MudStep Title="Bank Details" >
