@@ -13,10 +13,21 @@ public class AuthenticationService : IAuthenticationSerivice
 {
     private readonly IConfiguration _config;
 
-    private readonly List<(string Username, string Password, string Role)> _users = new()
+    private List<Users> _users = new ()
     {
-        ("Bishodeep", "admin123", "Admin"),
-        ("NoramlUser", "user123", "User")
+        new Users
+            {
+                Email="Bishodeep@gmail.com",
+                Password="admin123", 
+                Role="Admin"
+            },
+        new Users
+        {
+            Email="NoramlUser@gmail.com",
+            Password="user123",
+            Role="User"
+        }
+        
     };
 
     public AuthenticationService(IConfiguration config)
@@ -28,9 +39,9 @@ public class AuthenticationService : IAuthenticationSerivice
     public LoginResponse Authenticate(LoginRequest loginRequest)
     {
         var user = _users.FirstOrDefault(u =>
-            u.Username == loginRequest.Email && u.Password == loginRequest.Password);
+            u.Email.Trim().ToUpper() == loginRequest.Email.Trim().ToUpper() && u.Password.Trim().ToUpper() == loginRequest.Password.Trim().ToUpper());
 
-        if (user == default) return null;
+        if (user == null) return null;
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
@@ -39,7 +50,7 @@ public class AuthenticationService : IAuthenticationSerivice
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.Role, user.Role)
             }),
             Expires = DateTime.UtcNow.AddHours(1),
@@ -54,4 +65,11 @@ public class AuthenticationService : IAuthenticationSerivice
     }
 
    
+}
+
+public class Users
+{
+    public string Email { get; set; }
+    public string Password { get; set; }
+    public string Role { get; set; }
 }

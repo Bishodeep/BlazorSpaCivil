@@ -24,7 +24,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
     });
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorClient",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:7108") // Replace with your Blazor client URL
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
@@ -37,7 +46,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowBlazorClient");
 app.UseHttpsRedirection();
 
 app.MapPost("/login", (LoginRequest login, IAuthenticationSerivice authService) =>
@@ -45,9 +54,5 @@ app.MapPost("/login", (LoginRequest login, IAuthenticationSerivice authService) 
     var result = authService.Authenticate(login);
     return result is null ? Results.Unauthorized() : Results.Ok(result);
 });
-app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+app.Run();

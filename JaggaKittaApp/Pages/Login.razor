@@ -1,7 +1,12 @@
+@using System.Net
 @using FluentValidation
+@using JaggaKittaApp.Authorization
 @using JaggaKittaApp.Models
+@using JaggaKittaApp.Services
 @using JaggaKittaApp.Validators
 @layout LoginLayout
+
+@inject HttpClient Http
 @page "/login"
 <MudThemeProvider></MudThemeProvider>
 <MudDialogProvider></MudDialogProvider>
@@ -52,6 +57,8 @@
 @code {
     [Inject] ISnackbar Snackbar { get; set; }
     [Inject] NavigationManager Navigation { get; set; }
+    [Inject] UserAuthStateProvider AuthStateProvider { get; set; }
+    [Inject] IAuthenticationService _authenticationService { get; set; }
     MudForm _form;
     private bool _isSubmitting = false;
     LoginFluentValidator _loginValidator = new();
@@ -65,9 +72,9 @@
 
         if (_form.IsValid)
         {
-             _isSubmitting = true;
-            // Snackbar.Add("Submitted!");
-            Navigation.NavigateTo("/home");
+            if(await _authenticationService.Authenticate(_model))
+            Navigation.NavigateTo("/");
+            
         }
     }
 
