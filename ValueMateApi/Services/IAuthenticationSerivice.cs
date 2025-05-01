@@ -4,5 +4,6 @@ namespace ValueMateApi.Services;
 
 public interface IAuthenticationSerivice
 {
-    LoginResponse Authenticate(LoginRequest loginRequest);
+    Task<LoginResponseDto> AuthenticateAsync(LoginRequestDto loginRequestDto);
+    Task<bool> RegisterAsync(RegisterDto model);
 }

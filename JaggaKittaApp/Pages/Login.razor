@@ -71,7 +71,7 @@
 
         if (_form.IsValid)
         {
-            if(await _authenticationService.Authenticate(_model))
+            if(await _authenticationService.AuthenticateAsync(_model))
             Navigation.NavigateTo("/");
             
         }

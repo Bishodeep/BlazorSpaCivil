@@ -14,9 +14,20 @@ public class AuthenticationService:IAuthenticationService
         _client = client;
         _authenticationStateProvider= authenticationStateProvider;
     }
-    public async Task<bool> Authenticate(LoginModel loginModel)
+    public async Task<bool> AuthenticateAsync(LoginModel loginModel)
     {
         var response = await _client.PostAsJsonAsync("/login", loginModel);
+        if (response.IsSuccessStatusCode)
+        {
+            var tokenResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+            _authenticationStateProvider.SetToken(tokenResponse.Token);
+            return true;
+        }
+        return false;
+    }
+    public async Task<bool> RegisterAsync(RegisterModel registerModel)
+    {
+        var response = await _client.PostAsJsonAsync("/register", registerModel);
         if (response.IsSuccessStatusCode)
         {
             var tokenResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();

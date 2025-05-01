@@ -1,58 +1,51 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.IdentityModel.Tokens;
+using ValueMateApi.Constants;
+using ValueMateApi.Data.Entities;
 using ValueMateApi.Models;
-using LoginRequest = ValueMateApi.Models.LoginRequest;
-using LoginResponse = ValueMateApi.Models.LoginResponse;
 
 namespace ValueMateApi.Services;
 
 public class AuthenticationService : IAuthenticationSerivice
 {
     private readonly IConfiguration _config;
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
 
-    private List<Users> _users = new ()
-    {
-        new Users
-            {
-                Email="Bishodeep@gmail.com",
-                Password="admin123", 
-                Role="Admin"
-            },
-        new Users
-        {
-            Email="NoramlUser@gmail.com",
-            Password="user123",
-            Role="User"
-        }
-        
-    };
-
-    public AuthenticationService(IConfiguration config)
+    public AuthenticationService(IConfiguration config,UserManager<IdentityUser> userManager,SignInManager<IdentityUser> signInManager)
     {
         _config = config;
+        _userManager = userManager;
+        _signInManager = signInManager;
     }
-
-
-    public LoginResponse Authenticate(LoginRequest loginRequest)
+    public async Task<LoginResponseDto> AuthenticateAsync(LoginRequestDto loginRequestDto)
     {
-        var user = _users.FirstOrDefault(u =>
-            u.Email.Trim().ToUpper() == loginRequest.Email.Trim().ToUpper() && u.Password.Trim().ToUpper() == loginRequest.Password.Trim().ToUpper());
+        var user = await _userManager.FindByEmailAsync(loginRequestDto.Email);
+        if (user == null)
+            return null;
 
-        if (user == null) return null;
+        var result = await _signInManager.CheckPasswordSignInAsync(user, loginRequestDto.Password, false);
+        if (!result.Succeeded)
+            return null;
+        var roles = await _userManager.GetRolesAsync(user);
 
+
+        var claims = new List<Claim>();
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+        claims.Add(new Claim(ClaimTypes.Email, user.Email));
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
-            }),
+            Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
@@ -61,9 +54,28 @@ public class AuthenticationService : IAuthenticationSerivice
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var tokenString = tokenHandler.WriteToken(token);
-        return new LoginResponse(tokenString);
+        return new LoginResponseDto(tokenString);
     }
 
+    public async Task<bool> RegisterAsync(RegisterDto model)
+    {
+        var user = new ApplicationUser() 
+            { 
+                UserName = model.Email,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                MiddleName = model.MiddleName,
+                PhoneNumber=model.Phone
+            };
+        var result = await _userManager.CreateAsync(user, model.Password);
+
+        if (!result.Succeeded)
+            return false;
+
+        await _userManager.AddToRoleAsync(user, ApplicationRoleConstants.User); // Default role
+        return true;
+    }
    
 }
 

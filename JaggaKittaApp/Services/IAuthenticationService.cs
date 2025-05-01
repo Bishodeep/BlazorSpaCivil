@@ -4,5 +4,6 @@ namespace JaggaKittaApp.Services;
 
 public interface IAuthenticationService
 {
-   Task<bool> Authenticate(LoginModel loginModel); 
+   Task<bool> AuthenticateAsync(LoginModel loginModel); 
+   Task<bool> RegisterAsync(RegisterModel registerModel); 
 }

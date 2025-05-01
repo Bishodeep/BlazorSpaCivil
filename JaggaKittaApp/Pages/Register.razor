@@ -1,0 +1,54 @@
+@using JaggaKittaApp.Constants
+@using JaggaKittaApp.Models
+@using JaggaKittaApp.Services
+@using Microsoft.AspNetCore.Authorization
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = ApplicationRoleConstants.Admin)]
+<h3>Register</h3>
+
+<MudPaper Class="pa-6 mx-auto mt-12" MaxWidth="400px">
+    <MudText Typo="Typo.h5">Register</MudText>
+
+    <MudForm @ref="form" OnValidSubmit="HandleRegister">
+        <MudTextField @bind-Value="model.FirstName" Label="First Name"/>
+        <MudTextField @bind-Value="model.MiddleName" Label="Middle Name"/>
+        <MudTextField @bind-Value="model.LastName" Label="Last Name"/>
+        <MudTextField @bind-Value="model.Phone" Label="Phone"/>
+        <MudTextField Label="Email" @bind-Value="model.Email" Required="true" For="@(() => model.Email)"/>
+        <MudTextField Label="Password" @bind-Value="model.Password" Required="true" For="@(() => model.Password)" InputType="InputType.Password"/>
+        <MudTextField Label="Confirm Password" @bind-Value="ConfirmPassword" Required="true" InputType="InputType.Password"/>
+
+        @if (!IsPasswordMatch)
+        {
+            <MudText Color="Color.Error" Typo="Typo.caption">Passwords do not match.</MudText>
+        }
+
+        <MudButton Type="Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@(!IsPasswordMatch)">Register</MudButton>
+    </MudForm>
+</MudPaper>
+<MudPaper Class="p-4" Style="margin-bottom: 10px;">
+    
+    <MudTextField @bind-Value="model.Email" Label="Email"/>
+</MudPaper>
+@code {
+    private RegisterModel model = new();
+    private MudForm form;
+    private string ConfirmPassword;
+    private bool IsPasswordMatch => model.Password == ConfirmPassword;
+    [Inject] IAuthenticationService _authenticationService { get; set; }
+
+    private async Task HandleRegister()
+    {
+        await form.Validate();
+
+        if (!IsPasswordMatch || !form.IsValid)
+            return;
+
+        var result = await _authenticationService.RegisterAsync(model);
+
+        if (result)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+}

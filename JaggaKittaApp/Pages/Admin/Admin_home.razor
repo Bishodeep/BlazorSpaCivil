@@ -2,7 +2,8 @@
 @using JaggaKittaApp.Constants
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize(Roles = ApplicationRoleConstants.Admin)]
-<h3>Admin</h3>
+@layout AdminLayout
+<h3>Dashboard</h3>
 
 @code {
     
